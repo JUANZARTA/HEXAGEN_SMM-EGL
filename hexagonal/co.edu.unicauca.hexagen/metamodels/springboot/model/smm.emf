@@ -5,7 +5,7 @@ package smm;
 // ENUMS
 // ==========================================
 enum HttpMethod {
-  GET; POST; PUT; DELETE;
+  GET; POST; PUT; DELETE; PATCH;
 }
 
 enum ParamKind {
@@ -21,7 +21,7 @@ enum CollectionKind {
 }
 
 // ==========================================
-// SISTEMA DE TIPADO EXHAUSTIVO
+// SISTEMA DE TIPADO
 // ==========================================
 abstract class Type {}
 
@@ -44,36 +44,23 @@ class MapType extends Type {
 }
 
 // ==========================================
-// ESTRUCTURA HEXAGONAL Y APLICACIÓN
+// APLICACIÓN Y MÓDULO
 // ==========================================
 class Application {
   attr String name;
   attr String basePackage;
   attr String javaVersion;
   attr String serverPort;
-  val BoundedContext[*] contexts;
+  val Module[*] modules;
 }
 
-class BoundedContext {
+class Module {
   attr String name;
-  val DomainLayer domain;
-  val ApplicationLayer application;
-  val InfrastructureLayer infrastructure;
-}
-
-class DomainLayer {
   val Entity[*] entities;
   val ValueObject[*] valueObjects;
-  val RepositoryPort[*] repositoryPorts;
-}
-
-class ApplicationLayer {
+  val Repository[*] repositories;
   val Service[*] services;
-}
-
-class InfrastructureLayer {
   val Controller[*] controllers;
-  val RepositoryAdapter[*] repositoryAdapters;
   val Dto[*] dtos;
 }
 
@@ -98,21 +85,24 @@ class Entity extends JavaClass {
 
 class ValueObject extends JavaClass {}
 
-class RepositoryPort extends NamedElement {
+// ==========================================
+// REPOSITORIO (Spring Data JPA)
+// ==========================================
+class Repository extends NamedElement {
   ref Entity entityType;
   val Type idType;
   val Method[*] methods;
 }
 
 // ==========================================
-// COMPONENTES DE APLICACIÓN
+// SERVICIO
 // ==========================================
 class Service extends JavaClass {
-  ref RepositoryPort[*] requiredPorts;
+  ref Repository[*] requiredRepositories;
 }
 
 // ==========================================
-// COMPONENTES DE INFRAESTRUCTURA
+// CONTROLADOR Y DTO
 // ==========================================
 class Controller extends JavaClass {
   attr String basePath;
@@ -120,14 +110,10 @@ class Controller extends JavaClass {
   val Endpoint[*] endpoints;
 }
 
-class RepositoryAdapter extends JavaClass {
-  ref RepositoryPort implementsPort;
-}
-
 class Dto extends JavaClass {}
 
 // ==========================================
-// MIEMBROS DE CLASE (Atributos, Métodos)
+// MIEMBROS DE CLASE
 // ==========================================
 class Attribute extends NamedElement {
   val Type type;

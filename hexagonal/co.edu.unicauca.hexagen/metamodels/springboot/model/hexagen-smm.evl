@@ -1,7 +1,7 @@
 -- ============================================================
 -- HEXAGEN-SMM Well-Formedness Constraints
--- Metamodel: smm (Hexagonal Architecture Spring Boot Metamodel)
--- Conforms to: WFC-01 through WFC-25 in the Technical Report
+-- Metamodel: smm (Spring Model Metamodel — generic Spring Boot)
+-- Conforms to: WFC-01 through WFC-24 in the Technical Report
 -- ============================================================
 
 -- WFC-01: Application must have a non-empty name
@@ -17,18 +17,18 @@ context Application {
         message : "Application '" + self.name + "' must have a non-empty basePackage."
     }
 
-    -- WFC-03: Application must contain at least one BoundedContext
-    constraint ApplicationHasContexts {
-        check : self.contexts.size() > 0
-        message : "Application '" + self.name + "' must contain at least one BoundedContext."
+    -- WFC-03: Application must contain at least one Module
+    constraint ApplicationHasModules {
+        check : self.modules.size() > 0
+        message : "Application '" + self.name + "' must contain at least one Module."
     }
 }
 
--- WFC-04: BoundedContext must have a non-empty name
-context BoundedContext {
-    constraint BoundedContextHasName {
+-- WFC-04: Module must have a non-empty name
+context Module {
+    constraint ModuleHasName {
         check : self.name.isDefined() and self.name.trim().length() > 0
-        message : "Every BoundedContext must have a non-empty name."
+        message : "Every Module must have a non-empty name."
     }
 }
 
@@ -45,16 +45,16 @@ context Entity {
     }
 }
 
--- WFC-07 and WFC-08: RepositoryPort constraints
-context RepositoryPort {
-    constraint RepositoryPortHasName {
+-- WFC-07 and WFC-08: Repository constraints
+context Repository {
+    constraint RepositoryHasName {
         check : self.name.isDefined() and self.name.trim().length() > 0
-        message : "Every RepositoryPort must have a non-empty name."
+        message : "Every Repository must have a non-empty name."
     }
 
-    constraint RepositoryPortHasEntityType {
+    constraint RepositoryHasEntityType {
         check : self.entityType.isDefined()
-        message : "RepositoryPort '" + self.name + "' must reference an Entity via entityType."
+        message : "Repository '" + self.name + "' must reference an Entity via entityType."
     }
 }
 
@@ -65,9 +65,9 @@ context Service {
         message : "Every Service must have a non-empty name."
     }
 
-    constraint ServiceHasRequiredPorts {
-        check : self.requiredPorts.size() > 0
-        message : "Service '" + self.name + "' must reference at least one RepositoryPort via requiredPorts."
+    constraint ServiceHasRequiredRepositories {
+        check : self.requiredRepositories.size() > 0
+        message : "Service '" + self.name + "' must reference at least one Repository via requiredRepositories."
     }
 }
 
@@ -89,20 +89,7 @@ context Controller {
     }
 }
 
--- WFC-14, WFC-15: RepositoryAdapter constraints
-context RepositoryAdapter {
-    constraint RepositoryAdapterHasName {
-        check : self.name.isDefined() and self.name.trim().length() > 0
-        message : "Every RepositoryAdapter must have a non-empty name."
-    }
-
-    constraint RepositoryAdapterImplementsPort {
-        check : self.implementsPort.isDefined()
-        message : "RepositoryAdapter '" + self.name + "' must implement a RepositoryPort via implementsPort."
-    }
-}
-
--- WFC-16, WFC-17, WFC-18: Endpoint constraints
+-- WFC-14, WFC-15, WFC-16: Endpoint constraints
 context Endpoint {
     constraint EndpointHasName {
         check : self.name.isDefined() and self.name.trim().length() > 0
@@ -116,11 +103,11 @@ context Endpoint {
 
     constraint EndpointHasHttpMethod {
         check : self.httpMethod.isDefined()
-        message : "Endpoint '" + self.name + "' must have a defined httpMethod (GET, POST, PUT, or DELETE)."
+        message : "Endpoint '" + self.name + "' must have a defined httpMethod (GET, POST, PUT, DELETE, or PATCH)."
     }
 }
 
--- WFC-19, WFC-20: Attribute constraints
+-- WFC-17, WFC-18: Attribute constraints
 context Attribute {
     constraint AttributeHasName {
         check : self.name.isDefined() and self.name.trim().length() > 0
@@ -133,7 +120,7 @@ context Attribute {
     }
 }
 
--- WFC-21, WFC-22: Parameter constraints
+-- WFC-19, WFC-20: Parameter constraints
 context Parameter {
     constraint ParameterHasName {
         check : self.name.isDefined() and self.name.trim().length() > 0
@@ -146,7 +133,7 @@ context Parameter {
     }
 }
 
--- WFC-23: Dto constraints
+-- WFC-21: Dto constraints
 context Dto {
     constraint DtoHasName {
         check : self.name.isDefined() and self.name.trim().length() > 0
@@ -154,7 +141,7 @@ context Dto {
     }
 }
 
--- WFC-24: CollectionType must have an innerType
+-- WFC-22: CollectionType must have an innerType
 context CollectionType {
     constraint CollectionTypeHasInnerType {
         check : self.innerType.isDefined()
@@ -162,7 +149,7 @@ context CollectionType {
     }
 }
 
--- WFC-25: MapType must have both key and value types
+-- WFC-23: MapType must have both key and value types
 context MapType {
     constraint MapTypeHasKeyType {
         check : self.keyType.isDefined()
